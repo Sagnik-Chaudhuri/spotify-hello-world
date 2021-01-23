@@ -1,0 +1,29 @@
+# package directories
+node_modules
+
+# Serverless directories
+.serverless
+
+# Typescript builds
+.build
+
+# testing data files
+.csv
+
+# Errors
+yarn-error.log
+
+# python environment
+venv
+__pycache__
+*.pyc
+.mypy_cache
+
+#coverage files
+.coverage
+htmlcov
+
+
+.vscode
+package-lock.json
+yarn.lock

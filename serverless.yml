@@ -1,0 +1,42 @@
+service: spotify-personal
+
+package:
+  exclude:
+    - venv/**
+    - node_modules/**
+
+plugins:
+  - serverless-python-requirements
+  - serverless-wsgi
+  - serverless-domain-manager
+
+custom:
+  wsgi:
+    app: app.app
+    packRequirements: false
+  pythonRequirements:
+    dockerizePip: non-linux
+    slim: true
+  
+  customEnvironment:
+    API_AUTH_TOKEN: abcd
+
+provider:
+  name: aws
+  runtime: python3.7
+
+functions:
+  app:
+    handler: wsgi_handler.handler
+    timeout: 30
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors:
+            headers: "*"
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors:
+            headers: "*"
