@@ -32,12 +32,6 @@ def _create_future_timestamp_from_seconds(seconds_from_current_time):
     return future_timestamp
 
 
-def _check_if_access_token_expired():
-    current_timestamp = datetime.utcnow().replace(
-        tzinfo=datetime_timezone.utc)
-    return session['tokens']['token_expiry_timestamp'] - timedelta(seconds=30) < current_timestamp
-
-
 @app.route('/', methods=['OPTIONS'])
 def options():
     return {}, 200
