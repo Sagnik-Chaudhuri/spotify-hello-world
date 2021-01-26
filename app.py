@@ -17,10 +17,25 @@ from flask import (
     session,
     url_for,
 )
+from datetime import datetime, timedelta, timezone as datetime_timezone
 
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(config.SESSION_SECRET_KEY_LENGTH)
+
+
+def _create_future_timestamp_from_seconds(seconds_from_current_time):
+    current_timestamp = datetime.utcnow().replace(
+        tzinfo=datetime_timezone.utc)
+    future_timestamp = current_timestamp + \
+        timedelta(seconds=seconds_from_current_time)
+    return future_timestamp
+
+
+def _check_if_access_token_expired():
+    current_timestamp = datetime.utcnow().replace(
+        tzinfo=datetime_timezone.utc)
+    return session['tokens']['token_expiry_timestamp'] - timedelta(seconds=30) < current_timestamp
 
 
 @app.route('/', methods=['OPTIONS'])
@@ -84,7 +99,7 @@ def callback():
     session['tokens'] = {
         'access_token': response_data.get('access_token'),
         'refresh_token': response_data.get('refresh_token'),
-        'token_expiry': response_data.get('expires_in')
+        'token_expiry_timestamp': _create_future_timestamp_from_seconds(response_data.get('expires_in'))
     }
 
     return 'Success', 200
@@ -106,4 +121,9 @@ def refresh():
     app.logger.info('\nrefresh url response: ', response_data)
 
     session['tokens']['access_token'] = response_data.get('access_token')
+    if response_data.get('refresh_token') is not None and response_data.get('refresh_token') != session['tokens'].get('refresh_token'):
+        session['tokens']['refresh_token'] = response_data.get('refresh_token')
+        session['tokens']['token_expiry_timestamp'] = _create_future_timestamp_from_seconds(
+            response_data.get('expires_in'))
+
     return json.dumps(session['tokens'])
