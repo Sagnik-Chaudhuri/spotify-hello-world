@@ -46,8 +46,7 @@ def login():
         'response_type': 'code',
         'redirect_uri': config.REDIRECT_URI,
         'scope': config.LOGIN_SCOPE,
-        'state': auth_state,
-        'show_dialog': True
+        'state': auth_state
     }
     response = make_response(
         redirect(f'{config.SPOTIFY_LOGIN_URL}/?{urlencode(payload)}'))
@@ -121,3 +120,26 @@ def refresh():
             response_data.get('expires_in'))
 
     return json.dumps(session['tokens'])
+
+
+@app.route('/me/playlists', methods=['GET'])
+def get_list_of_current_users_playlist():
+    '''Get a List of Current User's Playlists'''
+
+    # payload = {
+
+    # }
+    headers = {
+        'Authorization': f"Bearer {session['tokens'].get('access_token')}"
+    }
+    response = requests.get(
+        url=f"{config.SPOTIFY_ME_URL}/playlists", headers=headers)
+    response_data = response.json()
+    print('\nXD', response_data)
+
+    if response.status_code != 200:
+        app.logger.error(
+            'Failed to get a list of current user playlist: ', response_data.get('error'))
+        return response_data.get('error'), response.status_code
+
+    return response_data, 200
