@@ -1,5 +1,5 @@
-CLIENT_ID = 'e51c506eee9140f0888f719e20e10b85'
-CLIENT_SECRET = '7f6afe4206fd4dd7afcb1fabcc78dd42'
+CLIENT_ID = 'your_client_id'
+CLIENT_SECRET = 'your_client_secret'
 REDIRECT_URI = 'http://localhost:5000/callback'
 
 LOGIN_SCOPE = 'user-read-private user-read-email'
